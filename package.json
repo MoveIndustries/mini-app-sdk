@@ -1,0 +1,57 @@
+{
+  "name": "@movement-labs/miniapp-sdk",
+  "version": "0.1.0",
+  "description": "Official SDK for building Movement Mini Apps",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "pnpm run build"
+  },
+  "keywords": [
+    "movement",
+    "blockchain",
+    "miniapp",
+    "web3",
+    "wallet",
+    "aptos",
+    "move"
+  ],
+  "author": "Movement Labs",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/movementlabsxyz/movement-miniapp-sdk"
+  },
+  "bugs": {
+    "url": "https://github.com/movementlabsxyz/movement-miniapp-sdk/issues"
+  },
+  "homepage": "https://docs.movementlabs.xyz/miniapps",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.1.17",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}
