@@ -5,11 +5,12 @@
 export interface MovementAccount {
   address: string;
   publicKey: string;
+  balance?: string;
 }
 
 export interface NetworkInfo {
   chainId: number;
-  network: 'mainnet' | 'testnet';
+  network: 'mainnet' | 'testnet' | 'devnet';
   rpcUrl: string;
   explorerUrl: string;
 }
@@ -24,6 +25,8 @@ export interface TransactionPayload {
 export interface TransactionResult {
   hash: string;
   success: boolean;
+  version?: string;
+  vmStatus?: string;
 }
 
 export interface SignMessagePayload {
@@ -34,6 +37,7 @@ export interface SignMessagePayload {
 export interface SignMessageResult {
   signature: string;
   publicKey: string;
+  fullMessage?: string;
 }
 
 export interface HapticOptions {
@@ -45,25 +49,129 @@ export interface NotificationOptions {
   title: string;
   body: string;
   data?: Record<string, any>;
+  sound?: boolean;
+  badge?: number;
+}
+
+export interface ShareOptions {
+  title?: string;
+  message: string;
+  url?: string;
+}
+
+export interface StorageOptions {
+  key: string;
+  value?: string;
+}
+
+export interface CameraOptions {
+  quality?: number; // 0-1
+  allowsEditing?: boolean;
+  mediaTypes?: 'photo' | 'video' | 'all';
+}
+
+export interface CameraResult {
+  uri: string;
+  width: number;
+  height: number;
+  type: 'image' | 'video';
+}
+
+export interface LocationResult {
+  latitude: number;
+  longitude: number;
+  accuracy: number;
+  altitude?: number;
+  heading?: number;
+  speed?: number;
+}
+
+export interface BiometricOptions {
+  promptMessage?: string;
+  cancelText?: string;
+  fallbackToPasscode?: boolean;
+}
+
+export interface BiometricResult {
+  success: boolean;
+  biometricType?: 'FaceID' | 'TouchID' | 'Fingerprint';
+}
+
+export interface AppContext {
+  user: {
+    address: string;
+    publicKey: string;
+    verified: boolean;
+  };
+  app: {
+    id: string;
+    name: string;
+    version: string;
+  };
+  platform: {
+    os: 'ios' | 'android';
+    version: string;
+  };
+  features: {
+    haptics: boolean;
+    notifications: boolean;
+    camera: boolean;
+    biometrics: boolean;
+    location: boolean;
+  };
 }
 
 export interface MovementSDK {
-  // Connection
+  // Connection & Account
   isConnected: boolean;
   address?: string;
   network?: string;
 
-  // Methods
+  // Core Methods
   connect: () => Promise<MovementAccount>;
   getAccount: () => Promise<MovementAccount>;
+  getContext: () => Promise<AppContext>;
   sendTransaction: (payload: TransactionPayload) => Promise<TransactionResult>;
   signMessage: (payload: SignMessagePayload) => Promise<SignMessageResult>;
 
-  // Platform APIs
+  // Native Features
   haptic?: (options: HapticOptions) => Promise<void>;
   notify?: (options: NotificationOptions) => Promise<void>;
-  openUrl?: (url: string, target?: 'external' | 'in-app') => void;
-  close?: () => void;
+  share?: (options: ShareOptions) => Promise<{ success: boolean }>;
+  openUrl?: (url: string, target?: 'external' | 'in-app') => Promise<void>;
+  close?: () => Promise<void>;
+
+  // Device Storage
+  storage?: {
+    get: (key: string) => Promise<string | null>;
+    set: (key: string, value: string) => Promise<void>;
+    remove: (key: string) => Promise<void>;
+    clear: () => Promise<void>;
+  };
+
+  // Camera & Media
+  camera?: {
+    takePicture: (options?: CameraOptions) => Promise<CameraResult>;
+    pickImage: (options?: CameraOptions) => Promise<CameraResult>;
+  };
+
+  // Location
+  location?: {
+    getCurrentPosition: () => Promise<LocationResult>;
+    watchPosition: (callback: (position: LocationResult) => void) => () => void;
+  };
+
+  // Biometric Auth
+  biometric?: {
+    isAvailable: () => Promise<boolean>;
+    authenticate: (options?: BiometricOptions) => Promise<BiometricResult>;
+  };
+
+  // Clipboard
+  clipboard?: {
+    copy: (text: string) => Promise<void>;
+    paste: () => Promise<string>;
+  };
 }
 
 declare global {
