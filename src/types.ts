@@ -169,6 +169,7 @@ export interface MovementSDK {
   // Core Methods
   connect: () => Promise<MovementAccount>;
   getAccount: () => Promise<MovementAccount>;
+  getBalance: () => Promise<string>;
   getContext: () => Promise<AppContext>;
 
   // Transaction Methods

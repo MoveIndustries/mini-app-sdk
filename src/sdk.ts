@@ -54,6 +54,10 @@ class SecureMovementSDK {
     return await this.sdk.getAccount();
   }
 
+  async getBalance() {
+    return await this.sdk.getBalance();
+  }
+
   async sendTransaction(payload: TransactionPayload) {
     // Rate limiting
     if (!this.security.checkRateLimit('sendTransaction')) {
