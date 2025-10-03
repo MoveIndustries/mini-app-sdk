@@ -3,7 +3,16 @@
  * Main SDK interface for mini apps with security enhancements
  */
 
-import type { MovementSDK, TransactionPayload, SignMessagePayload } from './types';
+import type {
+  MovementSDK,
+  TransactionPayload,
+  SignMessagePayload,
+  MultiAgentTransactionPayload,
+  FeePayerTransactionPayload,
+  BatchTransactionPayload,
+  ScriptComposerPayload,
+  BatchTransactionResult,
+} from './types';
 import { createSecurityManager, type SecurityConfig } from './security';
 
 // Secure SDK wrapper
@@ -101,6 +110,100 @@ class SecureMovementSDK {
       ...payload,
       message: sanitizedMessage,
     });
+  }
+
+  async sendMultiAgentTransaction(payload: MultiAgentTransactionPayload) {
+    // Rate limiting
+    if (!this.security.checkRateLimit('sendMultiAgentTransaction')) {
+      throw new Error('Too many multi-agent transaction requests. Please try again later.');
+    }
+
+    // Validate base transaction
+    const validation = this.security.validateTransaction(payload);
+    if (!validation.valid) {
+      this.security.logSecurityEvent({
+        type: 'invalid_transaction',
+        details: validation.error || 'Multi-agent transaction validation failed',
+        metadata: payload,
+      });
+      throw new Error(validation.error);
+    }
+
+    // Validate secondary signers
+    if (!payload.secondarySigners || payload.secondarySigners.length === 0) {
+      throw new Error('Multi-agent transaction requires at least one secondary signer');
+    }
+
+    for (const signer of payload.secondarySigners) {
+      if (!this.security.isValidAddress(signer)) {
+        throw new Error(`Invalid secondary signer address: ${signer}`);
+      }
+    }
+
+    return await this.sdk.sendMultiAgentTransaction!(payload);
+  }
+
+  async sendFeePayerTransaction(payload: FeePayerTransactionPayload) {
+    // Rate limiting
+    if (!this.security.checkRateLimit('sendFeePayerTransaction')) {
+      throw new Error('Too many fee payer transaction requests. Please try again later.');
+    }
+
+    // Validate base transaction
+    const validation = this.security.validateTransaction(payload);
+    if (!validation.valid) {
+      throw new Error(validation.error);
+    }
+
+    // Validate fee payer address
+    if (!this.security.isValidAddress(payload.feePayer)) {
+      throw new Error(`Invalid fee payer address: ${payload.feePayer}`);
+    }
+
+    return await this.sdk.sendFeePayerTransaction!(payload);
+  }
+
+  async sendBatchTransactions(payload: BatchTransactionPayload) {
+    // Rate limiting
+    if (!this.security.checkRateLimit('sendBatchTransactions')) {
+      throw new Error('Too many batch transaction requests. Please try again later.');
+    }
+
+    // Validate all transactions in batch
+    for (const tx of payload.transactions) {
+      const validation = this.security.validateTransaction(tx);
+      if (!validation.valid) {
+        throw new Error(`Batch transaction validation failed: ${validation.error}`);
+      }
+    }
+
+    return await this.sdk.sendBatchTransactions!(payload);
+  }
+
+  async sendScriptTransaction(payload: ScriptComposerPayload) {
+    // Rate limiting
+    if (!this.security.checkRateLimit('sendScriptTransaction')) {
+      throw new Error('Too many script transaction requests. Please try again later.');
+    }
+
+    // Validate script payload
+    if (!payload.script || payload.script.length === 0) {
+      throw new Error('Script payload cannot be empty');
+    }
+
+    return await this.sdk.sendScriptTransaction!(payload);
+  }
+
+  async getContext() {
+    return await this.sdk.getContext();
+  }
+
+  async waitForTransaction(hash: string) {
+    return await this.sdk.waitForTransaction(hash);
+  }
+
+  onTransactionUpdate(hash: string, callback: any) {
+    return this.sdk.onTransactionUpdate?.(hash, callback);
   }
 
   // Pass through optional methods

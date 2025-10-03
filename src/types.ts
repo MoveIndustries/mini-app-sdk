@@ -22,12 +22,51 @@ export interface TransactionPayload {
   type_arguments: string[];
 }
 
+// Multi-Agent Transaction
+export interface MultiAgentTransactionPayload extends TransactionPayload {
+  secondarySigners: string[]; // Addresses of additional signers
+}
+
+// Fee Payer (Sponsored) Transaction
+export interface FeePayerTransactionPayload extends TransactionPayload {
+  feePayer: string; // Address of account paying gas
+}
+
+// Batch Transaction
+export interface BatchTransactionPayload {
+  transactions: TransactionPayload[];
+}
+
+// Script Composer Transaction (for complex multi-function calls)
+export interface ScriptComposerPayload {
+  script: string; // Move script bytecode or composition
+  type_arguments?: string[];
+  arguments?: any[];
+}
+
 export interface TransactionResult {
   hash: string;
   success: boolean;
   version?: string;
   vmStatus?: string;
 }
+
+export interface BatchTransactionResult {
+  results: TransactionResult[];
+  successCount: number;
+  failureCount: number;
+}
+
+// Transaction monitoring
+export interface TransactionStatus {
+  hash: string;
+  status: 'pending' | 'success' | 'failed';
+  gasUsed?: string;
+  timestamp?: number;
+  error?: string;
+}
+
+export type TransactionStatusCallback = (status: TransactionStatus) => void;
 
 export interface SignMessagePayload {
   message: string;
@@ -131,8 +170,20 @@ export interface MovementSDK {
   connect: () => Promise<MovementAccount>;
   getAccount: () => Promise<MovementAccount>;
   getContext: () => Promise<AppContext>;
+
+  // Transaction Methods
   sendTransaction: (payload: TransactionPayload) => Promise<TransactionResult>;
+  sendMultiAgentTransaction: (payload: MultiAgentTransactionPayload) => Promise<TransactionResult>;
+  sendFeePayerTransaction: (payload: FeePayerTransactionPayload) => Promise<TransactionResult>;
+  sendBatchTransactions: (payload: BatchTransactionPayload) => Promise<BatchTransactionResult>;
+  sendScriptTransaction: (payload: ScriptComposerPayload) => Promise<TransactionResult>;
+
+  // Signing Methods
   signMessage: (payload: SignMessagePayload) => Promise<SignMessageResult>;
+
+  // Transaction Monitoring
+  waitForTransaction: (hash: string) => Promise<TransactionStatus>;
+  onTransactionUpdate?: (hash: string, callback: TransactionStatusCallback) => () => void;
 
   // Native Features
   haptic?: (options: HapticOptions) => Promise<void>;
