@@ -58,6 +58,19 @@ class SecureMovementSDK {
     return await this.sdk.getBalance();
   }
 
+  async scanQRCode() {
+    // Rate limiting
+    if (!this.security.checkRateLimit('scanQRCode')) {
+      this.security.logSecurityEvent({
+        type: 'rate_limit',
+        details: 'QR scanning rate limit exceeded',
+      });
+      throw new Error('Too many QR scan requests. Please try again later.');
+    }
+
+    return await this.sdk.scanQRCode!();
+  }
+
   async sendTransaction(payload: TransactionPayload) {
     // Rate limiting
     if (!this.security.checkRateLimit('sendTransaction')) {

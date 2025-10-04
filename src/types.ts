@@ -171,6 +171,7 @@ export interface MovementSDK {
   getAccount: () => Promise<MovementAccount>;
   getBalance: () => Promise<string>;
   getContext: () => Promise<AppContext>;
+  scanQRCode?: () => Promise<string>;
 
   // Transaction Methods
   sendTransaction: (payload: TransactionPayload) => Promise<TransactionResult>;
