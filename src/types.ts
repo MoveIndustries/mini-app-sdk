@@ -92,6 +92,23 @@ export interface NotificationOptions {
   badge?: number;
 }
 
+// UI Component Types
+export interface PopupButton {
+  id?: string;
+  type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive';
+  text: string;
+}
+
+export interface PopupOptions {
+  title?: string;
+  message: string;
+  buttons?: PopupButton[];
+}
+
+export interface PopupResult {
+  button_id?: string;
+}
+
 export interface ShareOptions {
   title?: string;
   message: string;
@@ -224,6 +241,39 @@ export interface MovementSDK {
   clipboard?: {
     copy: (text: string) => Promise<void>;
     paste: () => Promise<string>;
+  };
+
+  // UI Components
+  showPopup?: (options: PopupOptions) => Promise<PopupResult>;
+  showAlert?: (message: string) => Promise<void>;
+  showConfirm?: (message: string, okText?: string, cancelText?: string) => Promise<boolean>;
+
+  MainButton?: {
+    setText: (text: string) => void;
+    show: () => void;
+    hide: () => void;
+    onClick: (callback: () => void) => void;
+  };
+
+  SecondaryButton?: {
+    setText: (text: string) => void;
+    show: () => void;
+    hide: () => void;
+    onClick: (callback: () => void) => void;
+  };
+
+  BackButton?: {
+    show: () => void;
+    hide: () => void;
+    onClick: (callback: () => void) => void;
+  };
+
+  // Cloud Storage (persistent across sessions, 1024 items per user)
+  CloudStorage?: {
+    setItem: (key: string, value: string) => Promise<void>;
+    getItem: (key: string) => Promise<string | null>;
+    removeItem: (key: string) => Promise<void>;
+    getKeys: () => Promise<string[]>;
   };
 }
 

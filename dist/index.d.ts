@@ -18,12 +18,39 @@ interface TransactionPayload {
     arguments: any[];
     type_arguments: string[];
 }
+interface MultiAgentTransactionPayload extends TransactionPayload {
+    secondarySigners: string[];
+}
+interface FeePayerTransactionPayload extends TransactionPayload {
+    feePayer: string;
+}
+interface BatchTransactionPayload {
+    transactions: TransactionPayload[];
+}
+interface ScriptComposerPayload {
+    script: string;
+    type_arguments?: string[];
+    arguments?: any[];
+}
 interface TransactionResult {
     hash: string;
     success: boolean;
     version?: string;
     vmStatus?: string;
 }
+interface BatchTransactionResult {
+    results: TransactionResult[];
+    successCount: number;
+    failureCount: number;
+}
+interface TransactionStatus {
+    hash: string;
+    status: 'pending' | 'success' | 'failed';
+    gasUsed?: string;
+    timestamp?: number;
+    error?: string;
+}
+type TransactionStatusCallback = (status: TransactionStatus) => void;
 interface SignMessagePayload {
     message: string;
     nonce?: string;
@@ -43,6 +70,19 @@ interface NotificationOptions {
     data?: Record<string, any>;
     sound?: boolean;
     badge?: number;
+}
+interface PopupButton {
+    id?: string;
+    type?: 'default' | 'ok' | 'close' | 'cancel' | 'destructive';
+    text: string;
+}
+interface PopupOptions {
+    title?: string;
+    message: string;
+    buttons?: PopupButton[];
+}
+interface PopupResult {
+    button_id?: string;
 }
 interface ShareOptions {
     title?: string;
@@ -110,9 +150,17 @@ interface MovementSDK {
     network?: string;
     connect: () => Promise<MovementAccount>;
     getAccount: () => Promise<MovementAccount>;
+    getBalance: () => Promise<string>;
     getContext: () => Promise<AppContext>;
+    scanQRCode?: () => Promise<string>;
     sendTransaction: (payload: TransactionPayload) => Promise<TransactionResult>;
+    sendMultiAgentTransaction: (payload: MultiAgentTransactionPayload) => Promise<TransactionResult>;
+    sendFeePayerTransaction: (payload: FeePayerTransactionPayload) => Promise<TransactionResult>;
+    sendBatchTransactions: (payload: BatchTransactionPayload) => Promise<BatchTransactionResult>;
+    sendScriptTransaction: (payload: ScriptComposerPayload) => Promise<TransactionResult>;
     signMessage: (payload: SignMessagePayload) => Promise<SignMessageResult>;
+    waitForTransaction: (hash: string) => Promise<TransactionStatus>;
+    onTransactionUpdate?: (hash: string, callback: TransactionStatusCallback) => () => void;
     haptic?: (options: HapticOptions) => Promise<void>;
     notify?: (options: NotificationOptions) => Promise<void>;
     share?: (options: ShareOptions) => Promise<{
@@ -141,6 +189,32 @@ interface MovementSDK {
     clipboard?: {
         copy: (text: string) => Promise<void>;
         paste: () => Promise<string>;
+    };
+    showPopup?: (options: PopupOptions) => Promise<PopupResult>;
+    showAlert?: (message: string) => Promise<void>;
+    showConfirm?: (message: string, okText?: string, cancelText?: string) => Promise<boolean>;
+    MainButton?: {
+        setText: (text: string) => void;
+        show: () => void;
+        hide: () => void;
+        onClick: (callback: () => void) => void;
+    };
+    SecondaryButton?: {
+        setText: (text: string) => void;
+        show: () => void;
+        hide: () => void;
+        onClick: (callback: () => void) => void;
+    };
+    BackButton?: {
+        show: () => void;
+        hide: () => void;
+        onClick: (callback: () => void) => void;
+    };
+    CloudStorage?: {
+        setItem: (key: string, value: string) => Promise<void>;
+        getItem: (key: string) => Promise<string | null>;
+        removeItem: (key: string) => Promise<void>;
+        getKeys: () => Promise<string[]>;
     };
 }
 declare global {
@@ -218,8 +292,17 @@ declare class SecureMovementSDK {
     get network(): string | undefined;
     connect(): Promise<MovementAccount>;
     getAccount(): Promise<MovementAccount>;
+    getBalance(): Promise<string>;
+    scanQRCode(): Promise<string>;
     sendTransaction(payload: TransactionPayload): Promise<TransactionResult>;
     signMessage(payload: SignMessagePayload): Promise<SignMessageResult>;
+    sendMultiAgentTransaction(payload: MultiAgentTransactionPayload): Promise<TransactionResult>;
+    sendFeePayerTransaction(payload: FeePayerTransactionPayload): Promise<TransactionResult>;
+    sendBatchTransactions(payload: BatchTransactionPayload): Promise<BatchTransactionResult>;
+    sendScriptTransaction(payload: ScriptComposerPayload): Promise<TransactionResult>;
+    getContext(): Promise<AppContext>;
+    waitForTransaction(hash: string): Promise<TransactionStatus>;
+    onTransactionUpdate(hash: string, callback: any): (() => void) | undefined;
     haptic(options: any): Promise<void | undefined>;
     notify(options: any): Promise<void | undefined>;
     openUrl(url: string, target?: 'external' | 'in-app'): Promise<void> | undefined;
@@ -251,4 +334,4 @@ interface UseMovementAccountResult {
 }
 declare function useMovementAccount(): UseMovementAccountResult;
 
-export { type AppContext, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type NetworkInfo, type NotificationOptions, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type TransactionPayload, type TransactionResult, type UseMovementAccountResult, type UseMovementSDKResult, createSecurityManager, getMovementSDK, isInMovementApp, useMovementAccount, useMovementSDK, waitForSDK };
+export { type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseMovementAccountResult, type UseMovementSDKResult, createSecurityManager, getMovementSDK, isInMovementApp, useMovementAccount, useMovementSDK, waitForSDK };

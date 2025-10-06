@@ -1,6 +1,6 @@
 {
   "name": "@movement-labs/miniapp-sdk",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Official SDK for building Movement Mini Apps",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
