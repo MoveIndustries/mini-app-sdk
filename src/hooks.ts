@@ -29,26 +29,32 @@ export function useMovementSDK(): UseMovementSDKResult {
       return;
     }
 
-    if (window.movementSDK) {
-      setSDK(window.movementSDK);
-      setIsConnected(window.movementSDK.isConnected);
-      setAddress(window.movementSDK.address || null);
+    // Check if SDK is installed
+    if (!window.movementSDK?.isInstalled?.()) {
       setIsLoading(false);
-    } else {
-      // Wait a bit for SDK to load
-      const timeout = setTimeout(() => {
+      setError(new Error('Movement SDK not available - please open in Movement wallet'));
+      return;
+    }
+
+    // Initialize SDK using ready() pattern
+    const initSDK = async () => {
+      try {
         if (window.movementSDK) {
+          // Wait for SDK to be ready
+          await window.movementSDK.ready();
+
           setSDK(window.movementSDK);
           setIsConnected(window.movementSDK.isConnected);
           setAddress(window.movementSDK.address || null);
-        } else {
-          setError(new Error('Movement SDK not available'));
+          setIsLoading(false);
         }
+      } catch (err) {
+        setError(err as Error);
         setIsLoading(false);
-      }, 1000);
+      }
+    };
 
-      return () => clearTimeout(timeout);
-    }
+    initSDK();
   }, []);
 
   const connect = useCallback(async () => {
@@ -107,12 +113,22 @@ export function useMovementAccount(): UseMovementAccountResult {
 
   useEffect(() => {
     const fetchAccount = async () => {
-      if (typeof window === 'undefined' || !window.movementSDK) {
+      if (typeof window === 'undefined') {
         setIsLoading(false);
         return;
       }
 
+      // Check if SDK is installed
+      if (!window.movementSDK?.isInstalled?.()) {
+        setIsLoading(false);
+        setError(new Error('Movement SDK not available - please open in Movement wallet'));
+        return;
+      }
+
       try {
+        // Wait for SDK to be ready
+        await window.movementSDK.ready();
+
         if (window.movementSDK.isConnected) {
           const acc = await window.movementSDK.getAccount();
           setAccount(acc);

@@ -183,6 +183,10 @@ export interface MovementSDK {
   address?: string;
   network?: string;
 
+  // SDK Status
+  isInstalled: () => boolean;
+  ready: () => Promise<boolean>;
+
   // Core Methods
   connect: () => Promise<MovementAccount>;
   getAccount: () => Promise<MovementAccount>;

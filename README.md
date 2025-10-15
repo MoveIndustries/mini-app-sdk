@@ -194,16 +194,67 @@ sdk.close?.();
 
 ## TypeScript Support
 
-Full TypeScript support with type definitions included.
+Full TypeScript support with comprehensive type definitions included.
+
+### Using Type Definitions
+
+For direct `window.movementSDK` usage (without npm package), reference the type definitions:
+
+```typescript
+/// <reference path="./movement-sdk.d.ts" />
+
+// Now you have full IntelliSense and type checking!
+const result = await window.movementSDK.sendTransaction({
+  function: '0x1::aptos_account::transfer',
+  arguments: ['0x123...', '1000000'],
+  title: 'Send MOVE',
+  useFeePayer: true,
+  gasLimit: 'Sponsored'
+});
+```
+
+### Import Types
 
 ```typescript
 import type {
   MovementSDK,
-  MovementAccount,
-  TransactionPayload,
-  TransactionResult
+  SendTransactionParams,
+  TransactionResult,
+  UserInfo,
+  PopupOptions
 } from '@movement-labs/miniapp-sdk';
 ```
+
+### Transaction Parameters
+
+The `SendTransactionParams` interface provides full type safety:
+
+```typescript
+interface SendTransactionParams {
+  /** Move function: address::module::function_name */
+  function: string;
+
+  /** Type arguments (optional) */
+  type_arguments?: string[];
+
+  /** Function arguments (optional) */
+  arguments?: any[];
+
+  /** UI title (optional) */
+  title?: string;
+
+  /** UI description (optional) */
+  description?: string;
+
+  /** Use sponsored transactions (optional) */
+  useFeePayer?: boolean;
+
+  /** Gas limit (optional) - use 'Sponsored' for sponsored txs */
+  gasLimit?: number | 'Sponsored';
+}
+```
+
+**Note:** The `to` field is now optional and automatically extracted from the `function` field (the address before the first `::`).
 
 ## Examples
 

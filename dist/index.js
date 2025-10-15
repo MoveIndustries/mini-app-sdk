@@ -222,6 +222,12 @@ var SecureMovementSDK = class {
   get network() {
     return this.sdk.network;
   }
+  isInstalled() {
+    return this.sdk.isInstalled();
+  }
+  async ready() {
+    return await this.sdk.ready();
+  }
   async connect() {
     if (!this.security.checkRateLimit("connect")) {
       this.security.logSecurityEvent({
@@ -383,32 +389,28 @@ function getMovementSDK(config) {
   return new SecureMovementSDK(window.movementSDK, config);
 }
 function isInMovementApp() {
-  return typeof window !== "undefined" && !!window.movementSDK;
+  return typeof window !== "undefined" && window.movementSDK?.isInstalled?.() === true;
 }
-function waitForSDK(timeout = 5e3, config) {
-  return new Promise((resolve, reject) => {
-    if (typeof window === "undefined") {
-      reject(new Error("Window is not defined - not running in browser"));
-      return;
-    }
-    if (window.movementSDK) {
-      const secureSDK = new SecureMovementSDK(window.movementSDK, config);
-      resolve(secureSDK);
-      return;
-    }
-    const checkInterval = setInterval(() => {
-      if (window.movementSDK) {
-        clearInterval(checkInterval);
-        clearTimeout(timeoutId);
-        const secureSDK = new SecureMovementSDK(window.movementSDK, config);
-        resolve(secureSDK);
-      }
-    }, 100);
-    const timeoutId = setTimeout(() => {
-      clearInterval(checkInterval);
-      reject(new Error("Movement SDK not found - app must run inside Movement Everything wallet"));
-    }, timeout);
+async function waitForSDK(timeout = 5e3, config) {
+  if (typeof window === "undefined") {
+    throw new Error("Window is not defined - not running in browser");
+  }
+  if (!window.movementSDK?.isInstalled?.()) {
+    throw new Error("Movement SDK not found - app must run inside Movement Everything wallet");
+  }
+  const timeoutPromise = new Promise((_, reject) => {
+    setTimeout(() => reject(new Error("SDK initialization timeout")), timeout);
   });
+  try {
+    await Promise.race([
+      window.movementSDK.ready(),
+      timeoutPromise
+    ]);
+    const secureSDK = new SecureMovementSDK(window.movementSDK, config);
+    return secureSDK;
+  } catch (error) {
+    throw new Error("Failed to initialize Movement SDK: " + error.message);
+  }
 }
 
 // src/hooks.ts
@@ -425,24 +427,26 @@ function useMovementSDK() {
       setError(new Error("Window is not defined"));
       return;
     }
-    if (window.movementSDK) {
-      setSDK(window.movementSDK);
-      setIsConnected(window.movementSDK.isConnected);
-      setAddress(window.movementSDK.address || null);
+    if (!window.movementSDK?.isInstalled?.()) {
       setIsLoading(false);
-    } else {
-      const timeout = setTimeout(() => {
+      setError(new Error("Movement SDK not available - please open in Movement wallet"));
+      return;
+    }
+    const initSDK = async () => {
+      try {
         if (window.movementSDK) {
+          await window.movementSDK.ready();
           setSDK(window.movementSDK);
           setIsConnected(window.movementSDK.isConnected);
           setAddress(window.movementSDK.address || null);
-        } else {
-          setError(new Error("Movement SDK not available"));
+          setIsLoading(false);
         }
+      } catch (err) {
+        setError(err);
         setIsLoading(false);
-      }, 1e3);
-      return () => clearTimeout(timeout);
-    }
+      }
+    };
+    initSDK();
   }, []);
   const connect = (0, import_react.useCallback)(async () => {
     if (!sdk) {
@@ -487,11 +491,17 @@ function useMovementAccount() {
   const [error, setError] = (0, import_react.useState)(null);
   (0, import_react.useEffect)(() => {
     const fetchAccount = async () => {
-      if (typeof window === "undefined" || !window.movementSDK) {
+      if (typeof window === "undefined") {
         setIsLoading(false);
         return;
       }
+      if (!window.movementSDK?.isInstalled?.()) {
+        setIsLoading(false);
+        setError(new Error("Movement SDK not available - please open in Movement wallet"));
+        return;
+      }
       try {
+        await window.movementSDK.ready();
         if (window.movementSDK.isConnected) {
           const acc = await window.movementSDK.getAccount();
           setAccount(acc);

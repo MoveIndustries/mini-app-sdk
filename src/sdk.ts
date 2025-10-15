@@ -37,6 +37,14 @@ class SecureMovementSDK {
     return this.sdk.network;
   }
 
+  isInstalled() {
+    return this.sdk.isInstalled();
+  }
+
+  async ready() {
+    return await this.sdk.ready();
+  }
+
   async connect() {
     // Rate limiting
     if (!this.security.checkRateLimit('connect')) {
@@ -255,36 +263,34 @@ export function getMovementSDK(config?: SecurityConfig): MovementSDK | null {
 }
 
 export function isInMovementApp(): boolean {
-  return typeof window !== 'undefined' && !!window.movementSDK;
+  return typeof window !== 'undefined' && window.movementSDK?.isInstalled?.() === true;
 }
 
-export function waitForSDK(timeout = 5000, config?: SecurityConfig): Promise<MovementSDK> {
-  return new Promise((resolve, reject) => {
-    if (typeof window === 'undefined') {
-      reject(new Error('Window is not defined - not running in browser'));
-      return;
-    }
+export async function waitForSDK(timeout = 5000, config?: SecurityConfig): Promise<MovementSDK> {
+  if (typeof window === 'undefined') {
+    throw new Error('Window is not defined - not running in browser');
+  }
 
-    if (window.movementSDK) {
-      const secureSDK = new SecureMovementSDK(window.movementSDK, config);
-      resolve(secureSDK as any as MovementSDK);
-      return;
-    }
+  if (!window.movementSDK?.isInstalled?.()) {
+    throw new Error('Movement SDK not found - app must run inside Movement Everything wallet');
+  }
 
-    const checkInterval = setInterval(() => {
-      if (window.movementSDK) {
-        clearInterval(checkInterval);
-        clearTimeout(timeoutId);
-        const secureSDK = new SecureMovementSDK(window.movementSDK, config);
-        resolve(secureSDK as any as MovementSDK);
-      }
-    }, 100);
-
-    const timeoutId = setTimeout(() => {
-      clearInterval(checkInterval);
-      reject(new Error('Movement SDK not found - app must run inside Movement Everything wallet'));
-    }, timeout);
+  // Wait for SDK to be ready
+  const timeoutPromise = new Promise<never>((_, reject) => {
+    setTimeout(() => reject(new Error('SDK initialization timeout')), timeout);
   });
+
+  try {
+    await Promise.race([
+      window.movementSDK.ready(),
+      timeoutPromise
+    ]);
+
+    const secureSDK = new SecureMovementSDK(window.movementSDK, config);
+    return secureSDK as any as MovementSDK;
+  } catch (error) {
+    throw new Error('Failed to initialize Movement SDK: ' + (error as Error).message);
+  }
 }
 
 export { SecureMovementSDK };

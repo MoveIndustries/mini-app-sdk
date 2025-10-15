@@ -148,6 +148,8 @@ interface MovementSDK {
     isConnected: boolean;
     address?: string;
     network?: string;
+    isInstalled: () => boolean;
+    ready: () => Promise<boolean>;
     connect: () => Promise<MovementAccount>;
     getAccount: () => Promise<MovementAccount>;
     getBalance: () => Promise<string>;
@@ -290,6 +292,8 @@ declare class SecureMovementSDK {
     get isConnected(): boolean;
     get address(): string | undefined;
     get network(): string | undefined;
+    isInstalled(): boolean;
+    ready(): Promise<boolean>;
     connect(): Promise<MovementAccount>;
     getAccount(): Promise<MovementAccount>;
     getBalance(): Promise<string>;
