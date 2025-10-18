@@ -26,6 +26,7 @@ __export(index_exports, {
   isInMovementApp: () => isInMovementApp,
   useMovementAccount: () => useMovementAccount,
   useMovementSDK: () => useMovementSDK,
+  useMovementTheme: () => useMovementTheme,
   waitForSDK: () => waitForSDK
 });
 module.exports = __toCommonJS(index_exports);
@@ -522,6 +523,41 @@ function useMovementAccount() {
     error
   };
 }
+function useMovementTheme() {
+  const [theme, setTheme] = (0, import_react.useState)(null);
+  const [isLoading, setIsLoading] = (0, import_react.useState)(true);
+  const [error, setError] = (0, import_react.useState)(null);
+  (0, import_react.useEffect)(() => {
+    const fetchTheme = async () => {
+      if (typeof window === "undefined") {
+        setIsLoading(false);
+        return;
+      }
+      if (!window.movementSDK?.isInstalled?.()) {
+        setIsLoading(false);
+        setError(new Error("Movement SDK not available - please open in Movement wallet"));
+        return;
+      }
+      try {
+        await window.movementSDK.ready();
+        if (window.movementSDK.getTheme) {
+          const themeInfo = await window.movementSDK.getTheme();
+          setTheme(themeInfo);
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTheme();
+  }, []);
+  return {
+    theme,
+    isLoading,
+    error
+  };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   SecureMovementSDK,
@@ -530,5 +566,6 @@ function useMovementAccount() {
   isInMovementApp,
   useMovementAccount,
   useMovementSDK,
+  useMovementTheme,
   waitForSDK
 });

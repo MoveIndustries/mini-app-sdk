@@ -153,6 +153,10 @@ export interface BiometricResult {
   biometricType?: 'FaceID' | 'TouchID' | 'Fingerprint';
 }
 
+export interface ThemeInfo {
+  colorScheme: 'light' | 'dark';
+}
+
 export interface AppContext {
   user: {
     address: string;
@@ -175,6 +179,7 @@ export interface AppContext {
     biometrics: boolean;
     location: boolean;
   };
+  theme: ThemeInfo;
 }
 
 export interface MovementSDK {
@@ -192,6 +197,7 @@ export interface MovementSDK {
   getAccount: () => Promise<MovementAccount>;
   getBalance: () => Promise<string>;
   getContext: () => Promise<AppContext>;
+  getTheme: () => Promise<ThemeInfo>;
   scanQRCode?: () => Promise<string>;
 
   // Transaction Methods

@@ -3,7 +3,7 @@
  */
 
 import { useEffect, useState, useCallback } from 'react';
-import type { MovementSDK, MovementAccount, TransactionPayload, TransactionResult } from './types';
+import type { MovementSDK, MovementAccount, TransactionPayload, TransactionResult, ThemeInfo } from './types';
 
 export interface UseMovementSDKResult {
   sdk: MovementSDK | null;
@@ -147,6 +147,56 @@ export function useMovementAccount(): UseMovementAccountResult {
   return {
     account,
     isConnected,
+    isLoading,
+    error
+  };
+}
+
+export interface UseMovementThemeResult {
+  theme: ThemeInfo | null;
+  isLoading: boolean;
+  error: Error | null;
+}
+
+export function useMovementTheme(): UseMovementThemeResult {
+  const [theme, setTheme] = useState<ThemeInfo | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
+
+  useEffect(() => {
+    const fetchTheme = async () => {
+      if (typeof window === 'undefined') {
+        setIsLoading(false);
+        return;
+      }
+
+      // Check if SDK is installed
+      if (!window.movementSDK?.isInstalled?.()) {
+        setIsLoading(false);
+        setError(new Error('Movement SDK not available - please open in Movement wallet'));
+        return;
+      }
+
+      try {
+        // Wait for SDK to be ready
+        await window.movementSDK.ready();
+
+        if (window.movementSDK.getTheme) {
+          const themeInfo = await window.movementSDK.getTheme();
+          setTheme(themeInfo);
+        }
+      } catch (err) {
+        setError(err as Error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchTheme();
+  }, []);
+
+  return {
+    theme,
     isLoading,
     error
   };

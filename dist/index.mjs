@@ -490,6 +490,41 @@ function useMovementAccount() {
     error
   };
 }
+function useMovementTheme() {
+  const [theme, setTheme] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  useEffect(() => {
+    const fetchTheme = async () => {
+      if (typeof window === "undefined") {
+        setIsLoading(false);
+        return;
+      }
+      if (!window.movementSDK?.isInstalled?.()) {
+        setIsLoading(false);
+        setError(new Error("Movement SDK not available - please open in Movement wallet"));
+        return;
+      }
+      try {
+        await window.movementSDK.ready();
+        if (window.movementSDK.getTheme) {
+          const themeInfo = await window.movementSDK.getTheme();
+          setTheme(themeInfo);
+        }
+      } catch (err) {
+        setError(err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchTheme();
+  }, []);
+  return {
+    theme,
+    isLoading,
+    error
+  };
+}
 export {
   SecureMovementSDK,
   createSecurityManager,
@@ -497,5 +532,6 @@ export {
   isInMovementApp,
   useMovementAccount,
   useMovementSDK,
+  useMovementTheme,
   waitForSDK
 };

@@ -121,6 +121,9 @@ interface BiometricResult {
     success: boolean;
     biometricType?: 'FaceID' | 'TouchID' | 'Fingerprint';
 }
+interface ThemeInfo {
+    colorScheme: 'light' | 'dark';
+}
 interface AppContext {
     user: {
         address: string;
@@ -143,6 +146,7 @@ interface AppContext {
         biometrics: boolean;
         location: boolean;
     };
+    theme: ThemeInfo;
 }
 interface MovementSDK {
     isConnected: boolean;
@@ -154,6 +158,7 @@ interface MovementSDK {
     getAccount: () => Promise<MovementAccount>;
     getBalance: () => Promise<string>;
     getContext: () => Promise<AppContext>;
+    getTheme: () => Promise<ThemeInfo>;
     scanQRCode?: () => Promise<string>;
     sendTransaction: (payload: TransactionPayload) => Promise<TransactionResult>;
     sendMultiAgentTransaction: (payload: MultiAgentTransactionPayload) => Promise<TransactionResult>;
@@ -337,5 +342,11 @@ interface UseMovementAccountResult {
     error: Error | null;
 }
 declare function useMovementAccount(): UseMovementAccountResult;
+interface UseMovementThemeResult {
+    theme: ThemeInfo | null;
+    isLoading: boolean;
+    error: Error | null;
+}
+declare function useMovementTheme(): UseMovementThemeResult;
 
-export { type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseMovementAccountResult, type UseMovementSDKResult, createSecurityManager, getMovementSDK, isInMovementApp, useMovementAccount, useMovementSDK, waitForSDK };
+export { type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, createSecurityManager, getMovementSDK, isInMovementApp, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
