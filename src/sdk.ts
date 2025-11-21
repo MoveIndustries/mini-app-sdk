@@ -247,6 +247,11 @@ class SecureMovementSDK {
   close() {
     return this.sdk.close?.();
   }
+
+  // Expose storage object with all methods including getAll
+  get storage() {
+    return this.sdk.storage;
+  }
 }
 
 export function getMovementSDK(config?: SecurityConfig): MovementSDK | null {

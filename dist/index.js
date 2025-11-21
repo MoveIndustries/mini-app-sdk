@@ -379,6 +379,10 @@ var SecureMovementSDK = class {
   close() {
     return this.sdk.close?.();
   }
+  // Expose storage object with all methods including getAll
+  get storage() {
+    return this.sdk.storage;
+  }
 };
 function getMovementSDK(config) {
   if (typeof window === "undefined") {

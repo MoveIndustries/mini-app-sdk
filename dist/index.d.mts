@@ -180,6 +180,10 @@ interface MovementSDK {
         set: (key: string, value: string) => Promise<void>;
         remove: (key: string) => Promise<void>;
         clear: () => Promise<void>;
+        getAll: () => Promise<{
+            key: string;
+            value: string;
+        }[]>;
     };
     camera?: {
         takePicture: (options?: CameraOptions) => Promise<CameraResult>;
@@ -316,6 +320,16 @@ declare class SecureMovementSDK {
     notify(options: any): Promise<void | undefined>;
     openUrl(url: string, target?: 'external' | 'in-app'): Promise<void> | undefined;
     close(): Promise<void> | undefined;
+    get storage(): {
+        get: (key: string) => Promise<string | null>;
+        set: (key: string, value: string) => Promise<void>;
+        remove: (key: string) => Promise<void>;
+        clear: () => Promise<void>;
+        getAll: () => Promise<{
+            key: string;
+            value: string;
+        }[]>;
+    } | undefined;
 }
 declare function getMovementSDK(config?: SecurityConfig): MovementSDK | null;
 declare function isInMovementApp(): boolean;
