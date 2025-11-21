@@ -227,6 +227,7 @@ export interface MovementSDK {
     set: (key: string, value: string) => Promise<void>;
     remove: (key: string) => Promise<void>;
     clear: () => Promise<void>;
+    getAll: () => Promise<{ key: string; value: string }[]>;
   };
 
   // Camera & Media
