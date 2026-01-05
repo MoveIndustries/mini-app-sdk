@@ -157,6 +157,69 @@ export interface ThemeInfo {
   colorScheme: 'light' | 'dark';
 }
 
+// Analytics Types
+export interface AnalyticsConfig {
+  enabled?: boolean;
+  debug?: boolean;
+}
+
+export interface AnalyticsEventProperties {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface AnalyticsUserProperties {
+  [key: string]: string | number | boolean | null | undefined;
+}
+
+export interface AnalyticsAPI {
+  /**
+   * Track a custom event
+   * @param eventName - Name of the event to track
+   * @param properties - Optional properties to attach to the event
+   */
+  track: (eventName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+
+  /**
+   * Identify the current user with optional traits
+   * @param userId - Unique user identifier
+   * @param traits - Optional user properties/traits
+   */
+  identify: (userId: string, traits?: AnalyticsUserProperties) => Promise<void>;
+
+  /**
+   * Track a screen/page view
+   * @param screenName - Name of the screen being viewed
+   * @param properties - Optional additional properties
+   */
+  trackScreen: (screenName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+
+  /**
+   * Set user properties without tracking an event
+   * @param properties - Properties to set on the user profile
+   */
+  setUserProperties: (properties: AnalyticsUserProperties) => Promise<void>;
+
+  /**
+   * Reset analytics state (e.g., on logout)
+   */
+  reset: () => Promise<void>;
+
+  /**
+   * Check if analytics is enabled
+   */
+  isEnabled: () => Promise<boolean>;
+
+  /**
+   * Opt out of analytics tracking
+   */
+  optOut: () => Promise<void>;
+
+  /**
+   * Opt back into analytics tracking
+   */
+  optIn: () => Promise<void>;
+}
+
 export interface AppContext {
   user: {
     address: string;
@@ -286,6 +349,9 @@ export interface MovementSDK {
     removeItem: (key: string) => Promise<void>;
     getKeys: () => Promise<string[]>;
   };
+
+  // Analytics API (bridged to host app's Mixpanel)
+  analytics?: AnalyticsAPI;
 }
 
 declare global {

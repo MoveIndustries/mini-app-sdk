@@ -2,8 +2,17 @@
  * React Hooks for Movement SDK
  */
 
-import { useEffect, useState, useCallback } from 'react';
-import type { MovementSDK, MovementAccount, TransactionPayload, TransactionResult, ThemeInfo } from './types';
+import { useEffect, useState, useCallback, useMemo } from 'react';
+import type {
+  MovementSDK,
+  MovementAccount,
+  TransactionPayload,
+  TransactionResult,
+  ThemeInfo,
+  AnalyticsAPI,
+  AnalyticsEventProperties,
+  AnalyticsUserProperties,
+} from './types';
 
 export interface UseMovementSDKResult {
   sdk: MovementSDK | null;
@@ -199,5 +208,193 @@ export function useMovementTheme(): UseMovementThemeResult {
     theme,
     isLoading,
     error
+  };
+}
+
+// ============================================================================
+// Analytics Hook
+// ============================================================================
+
+export interface UseAnalyticsResult {
+  /**
+   * Track a custom event
+   */
+  track: (eventName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+
+  /**
+   * Identify the current user
+   */
+  identify: (userId: string, traits?: AnalyticsUserProperties) => Promise<void>;
+
+  /**
+   * Track a screen/page view
+   */
+  trackScreen: (screenName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+
+  /**
+   * Set user properties
+   */
+  setUserProperties: (properties: AnalyticsUserProperties) => Promise<void>;
+
+  /**
+   * Reset analytics state
+   */
+  reset: () => Promise<void>;
+
+  /**
+   * Check if analytics is enabled
+   */
+  isEnabled: boolean;
+
+  /**
+   * Opt out of analytics
+   */
+  optOut: () => Promise<void>;
+
+  /**
+   * Opt back into analytics
+   */
+  optIn: () => Promise<void>;
+
+  /**
+   * Whether SDK is available
+   */
+  isAvailable: boolean;
+}
+
+/**
+ * Hook for tracking analytics events in mini apps.
+ *
+ * Events are sent through the host app's analytics service (Mixpanel)
+ * with automatic mini-app context enrichment.
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { track, trackScreen, isAvailable } = useAnalytics();
+ *
+ *   useEffect(() => {
+ *     trackScreen('Home');
+ *   }, []);
+ *
+ *   const handleButtonClick = () => {
+ *     track('Button Clicked', { button_name: 'submit' });
+ *   };
+ *
+ *   return <button onClick={handleButtonClick}>Submit</button>;
+ * }
+ * ```
+ */
+export function useAnalytics(): UseAnalyticsResult {
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [isAvailable, setIsAvailable] = useState(false);
+
+  useEffect(() => {
+    // Check if SDK is available
+    if (typeof window !== 'undefined' && window.movementSDK?.analytics) {
+      setIsAvailable(true);
+    }
+  }, []);
+
+  const track = useCallback(async (eventName: string, properties?: AnalyticsEventProperties): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      console.log('[Analytics] SDK not available, skipping track:', eventName);
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.track(eventName, properties);
+    } catch (error) {
+      console.warn('[Analytics] Failed to track event:', eventName, error);
+    }
+  }, []);
+
+  const identify = useCallback(async (userId: string, traits?: AnalyticsUserProperties): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      console.log('[Analytics] SDK not available, skipping identify');
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.identify(userId, traits);
+    } catch (error) {
+      console.warn('[Analytics] Failed to identify user:', error);
+    }
+  }, []);
+
+  const trackScreen = useCallback(async (screenName: string, properties?: AnalyticsEventProperties): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      console.log('[Analytics] SDK not available, skipping trackScreen:', screenName);
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.trackScreen(screenName, properties);
+    } catch (error) {
+      console.warn('[Analytics] Failed to track screen:', screenName, error);
+    }
+  }, []);
+
+  const setUserProperties = useCallback(async (properties: AnalyticsUserProperties): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      console.log('[Analytics] SDK not available, skipping setUserProperties');
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.setUserProperties(properties);
+    } catch (error) {
+      console.warn('[Analytics] Failed to set user properties:', error);
+    }
+  }, []);
+
+  const reset = useCallback(async (): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.reset();
+    } catch (error) {
+      console.warn('[Analytics] Failed to reset:', error);
+    }
+  }, []);
+
+  const optOut = useCallback(async (): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.optOut();
+      setIsEnabled(false);
+    } catch (error) {
+      console.warn('[Analytics] Failed to opt out:', error);
+    }
+  }, []);
+
+  const optIn = useCallback(async (): Promise<void> => {
+    if (typeof window === 'undefined' || !window.movementSDK?.analytics) {
+      return;
+    }
+
+    try {
+      await window.movementSDK.analytics.optIn();
+      setIsEnabled(true);
+    } catch (error) {
+      console.warn('[Analytics] Failed to opt in:', error);
+    }
+  }, []);
+
+  return {
+    track,
+    identify,
+    trackScreen,
+    setUserProperties,
+    reset,
+    isEnabled,
+    optOut,
+    optIn,
+    isAvailable,
   };
 }
