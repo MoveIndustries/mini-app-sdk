@@ -529,11 +529,108 @@ function useMovementTheme() {
     error
   };
 }
+function useAnalytics() {
+  const [isEnabled, setIsEnabled] = useState(true);
+  const [isAvailable, setIsAvailable] = useState(false);
+  useEffect(() => {
+    if (typeof window !== "undefined" && window.movementSDK?.analytics) {
+      setIsAvailable(true);
+    }
+  }, []);
+  const track = useCallback(async (eventName, properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping track:", eventName);
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.track(eventName, properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to track event:", eventName, error);
+    }
+  }, []);
+  const identify = useCallback(async (userId, traits) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping identify");
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.identify(userId, traits);
+    } catch (error) {
+      console.warn("[Analytics] Failed to identify user:", error);
+    }
+  }, []);
+  const trackScreen = useCallback(async (screenName, properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping trackScreen:", screenName);
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.trackScreen(screenName, properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to track screen:", screenName, error);
+    }
+  }, []);
+  const setUserProperties = useCallback(async (properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping setUserProperties");
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.setUserProperties(properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to set user properties:", error);
+    }
+  }, []);
+  const reset = useCallback(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.reset();
+    } catch (error) {
+      console.warn("[Analytics] Failed to reset:", error);
+    }
+  }, []);
+  const optOut = useCallback(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.optOut();
+      setIsEnabled(false);
+    } catch (error) {
+      console.warn("[Analytics] Failed to opt out:", error);
+    }
+  }, []);
+  const optIn = useCallback(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.optIn();
+      setIsEnabled(true);
+    } catch (error) {
+      console.warn("[Analytics] Failed to opt in:", error);
+    }
+  }, []);
+  return {
+    track,
+    identify,
+    trackScreen,
+    setUserProperties,
+    reset,
+    isEnabled,
+    optOut,
+    optIn,
+    isAvailable
+  };
+}
 export {
   SecureMovementSDK,
   createSecurityManager,
   getMovementSDK,
   isInMovementApp,
+  useAnalytics,
   useMovementAccount,
   useMovementSDK,
   useMovementTheme,

@@ -124,6 +124,57 @@ interface BiometricResult {
 interface ThemeInfo {
     colorScheme: 'light' | 'dark';
 }
+interface AnalyticsConfig {
+    enabled?: boolean;
+    debug?: boolean;
+}
+interface AnalyticsEventProperties {
+    [key: string]: string | number | boolean | null | undefined;
+}
+interface AnalyticsUserProperties {
+    [key: string]: string | number | boolean | null | undefined;
+}
+interface AnalyticsAPI {
+    /**
+     * Track a custom event
+     * @param eventName - Name of the event to track
+     * @param properties - Optional properties to attach to the event
+     */
+    track: (eventName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+    /**
+     * Identify the current user with optional traits
+     * @param userId - Unique user identifier
+     * @param traits - Optional user properties/traits
+     */
+    identify: (userId: string, traits?: AnalyticsUserProperties) => Promise<void>;
+    /**
+     * Track a screen/page view
+     * @param screenName - Name of the screen being viewed
+     * @param properties - Optional additional properties
+     */
+    trackScreen: (screenName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+    /**
+     * Set user properties without tracking an event
+     * @param properties - Properties to set on the user profile
+     */
+    setUserProperties: (properties: AnalyticsUserProperties) => Promise<void>;
+    /**
+     * Reset analytics state (e.g., on logout)
+     */
+    reset: () => Promise<void>;
+    /**
+     * Check if analytics is enabled
+     */
+    isEnabled: () => Promise<boolean>;
+    /**
+     * Opt out of analytics tracking
+     */
+    optOut: () => Promise<void>;
+    /**
+     * Opt back into analytics tracking
+     */
+    optIn: () => Promise<void>;
+}
 interface AppContext {
     user: {
         address: string;
@@ -227,6 +278,7 @@ interface MovementSDK {
         removeItem: (key: string) => Promise<void>;
         getKeys: () => Promise<string[]>;
     };
+    analytics?: AnalyticsAPI;
 }
 declare global {
     interface Window {
@@ -362,5 +414,67 @@ interface UseMovementThemeResult {
     error: Error | null;
 }
 declare function useMovementTheme(): UseMovementThemeResult;
+interface UseAnalyticsResult {
+    /**
+     * Track a custom event
+     */
+    track: (eventName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+    /**
+     * Identify the current user
+     */
+    identify: (userId: string, traits?: AnalyticsUserProperties) => Promise<void>;
+    /**
+     * Track a screen/page view
+     */
+    trackScreen: (screenName: string, properties?: AnalyticsEventProperties) => Promise<void>;
+    /**
+     * Set user properties
+     */
+    setUserProperties: (properties: AnalyticsUserProperties) => Promise<void>;
+    /**
+     * Reset analytics state
+     */
+    reset: () => Promise<void>;
+    /**
+     * Check if analytics is enabled
+     */
+    isEnabled: boolean;
+    /**
+     * Opt out of analytics
+     */
+    optOut: () => Promise<void>;
+    /**
+     * Opt back into analytics
+     */
+    optIn: () => Promise<void>;
+    /**
+     * Whether SDK is available
+     */
+    isAvailable: boolean;
+}
+/**
+ * Hook for tracking analytics events in mini apps.
+ *
+ * Events are sent through the host app's analytics service (Mixpanel)
+ * with automatic mini-app context enrichment.
+ *
+ * @example
+ * ```tsx
+ * function MyComponent() {
+ *   const { track, trackScreen, isAvailable } = useAnalytics();
+ *
+ *   useEffect(() => {
+ *     trackScreen('Home');
+ *   }, []);
+ *
+ *   const handleButtonClick = () => {
+ *     track('Button Clicked', { button_name: 'submit' });
+ *   };
+ *
+ *   return <button onClick={handleButtonClick}>Submit</button>;
+ * }
+ * ```
+ */
+declare function useAnalytics(): UseAnalyticsResult;
 
-export { type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, createSecurityManager, getMovementSDK, isInMovementApp, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
+export { type AnalyticsAPI, type AnalyticsConfig, type AnalyticsEventProperties, type AnalyticsUserProperties, type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseAnalyticsResult, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, createSecurityManager, getMovementSDK, isInMovementApp, useAnalytics, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
