@@ -24,6 +24,7 @@ __export(index_exports, {
   createSecurityManager: () => createSecurityManager,
   getMovementSDK: () => getMovementSDK,
   isInMovementApp: () => isInMovementApp,
+  useAnalytics: () => useAnalytics,
   useMovementAccount: () => useMovementAccount,
   useMovementSDK: () => useMovementSDK,
   useMovementTheme: () => useMovementTheme,
@@ -562,12 +563,109 @@ function useMovementTheme() {
     error
   };
 }
+function useAnalytics() {
+  const [isEnabled, setIsEnabled] = (0, import_react.useState)(true);
+  const [isAvailable, setIsAvailable] = (0, import_react.useState)(false);
+  (0, import_react.useEffect)(() => {
+    if (typeof window !== "undefined" && window.movementSDK?.analytics) {
+      setIsAvailable(true);
+    }
+  }, []);
+  const track = (0, import_react.useCallback)(async (eventName, properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping track:", eventName);
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.track(eventName, properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to track event:", eventName, error);
+    }
+  }, []);
+  const identify = (0, import_react.useCallback)(async (userId, traits) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping identify");
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.identify(userId, traits);
+    } catch (error) {
+      console.warn("[Analytics] Failed to identify user:", error);
+    }
+  }, []);
+  const trackScreen = (0, import_react.useCallback)(async (screenName, properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping trackScreen:", screenName);
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.trackScreen(screenName, properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to track screen:", screenName, error);
+    }
+  }, []);
+  const setUserProperties = (0, import_react.useCallback)(async (properties) => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      console.log("[Analytics] SDK not available, skipping setUserProperties");
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.setUserProperties(properties);
+    } catch (error) {
+      console.warn("[Analytics] Failed to set user properties:", error);
+    }
+  }, []);
+  const reset = (0, import_react.useCallback)(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.reset();
+    } catch (error) {
+      console.warn("[Analytics] Failed to reset:", error);
+    }
+  }, []);
+  const optOut = (0, import_react.useCallback)(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.optOut();
+      setIsEnabled(false);
+    } catch (error) {
+      console.warn("[Analytics] Failed to opt out:", error);
+    }
+  }, []);
+  const optIn = (0, import_react.useCallback)(async () => {
+    if (typeof window === "undefined" || !window.movementSDK?.analytics) {
+      return;
+    }
+    try {
+      await window.movementSDK.analytics.optIn();
+      setIsEnabled(true);
+    } catch (error) {
+      console.warn("[Analytics] Failed to opt in:", error);
+    }
+  }, []);
+  return {
+    track,
+    identify,
+    trackScreen,
+    setUserProperties,
+    reset,
+    isEnabled,
+    optOut,
+    optIn,
+    isAvailable
+  };
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   SecureMovementSDK,
   createSecurityManager,
   getMovementSDK,
   isInMovementApp,
+  useAnalytics,
   useMovementAccount,
   useMovementSDK,
   useMovementTheme,
