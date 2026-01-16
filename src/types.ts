@@ -26,6 +26,7 @@ export interface TransactionPayload {
   useFeePayer?: boolean;
   feePayerUrl?: string;
   gasLimit?: string | number;
+  to?: string; // Recipient address for transfers
 }
 
 // Multi-Agent Transaction
@@ -94,7 +95,7 @@ export interface SignMessageResult {
 
 export interface HapticOptions {
   type: 'impact' | 'notification' | 'selection';
-  style?: 'light' | 'medium' | 'heavy';
+  style?: 'light' | 'medium' | 'heavy' | 'success' | 'error';
 }
 
 export interface NotificationOptions {

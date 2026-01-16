@@ -22,6 +22,7 @@ interface TransactionPayload {
     useFeePayer?: boolean;
     feePayerUrl?: string;
     gasLimit?: string | number;
+    to?: string;
 }
 interface MultiAgentTransactionPayload extends TransactionPayload {
     secondarySigners: string[];
@@ -72,7 +73,7 @@ interface SignMessageResult {
 }
 interface HapticOptions {
     type: 'impact' | 'notification' | 'selection';
-    style?: 'light' | 'medium' | 'heavy';
+    style?: 'light' | 'medium' | 'heavy' | 'success' | 'error';
 }
 interface NotificationOptions {
     title: string;
