@@ -17,6 +17,11 @@ interface TransactionPayload {
     function: string;
     arguments: any[];
     type_arguments: string[];
+    title?: string;
+    description?: string;
+    useFeePayer?: boolean;
+    feePayerUrl?: string;
+    gasLimit?: string | number;
 }
 interface MultiAgentTransactionPayload extends TransactionPayload {
     secondarySigners: string[];

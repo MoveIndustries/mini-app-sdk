@@ -20,6 +20,12 @@ export interface TransactionPayload {
   function: string;
   arguments: any[];
   type_arguments: string[];
+  // Optional me-app specific fields
+  title?: string;
+  description?: string;
+  useFeePayer?: boolean;
+  feePayerUrl?: string;
+  gasLimit?: string | number;
 }
 
 // Multi-Agent Transaction
