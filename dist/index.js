@@ -361,6 +361,16 @@ var SecureMovementSDK = class {
   async getContext() {
     return await this.sdk.getContext();
   }
+  async view(payload) {
+    if (!this.security.checkRateLimit("view")) {
+      this.security.logSecurityEvent({
+        type: "rate_limit",
+        details: "View function rate limit exceeded"
+      });
+      throw new Error("Too many view requests. Please try again later.");
+    }
+    return await this.sdk.view(payload);
+  }
   async waitForTransaction(hash) {
     return await this.sdk.waitForTransaction(hash);
   }

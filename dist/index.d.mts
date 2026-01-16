@@ -32,6 +32,11 @@ interface ScriptComposerPayload {
     type_arguments?: string[];
     arguments?: any[];
 }
+interface ViewPayload {
+    function: string;
+    type_arguments?: string[];
+    function_arguments?: any[];
+}
 interface TransactionResult {
     hash: string;
     success: boolean;
@@ -216,6 +221,7 @@ interface MovementSDK {
     sendFeePayerTransaction: (payload: FeePayerTransactionPayload) => Promise<TransactionResult>;
     sendBatchTransactions: (payload: BatchTransactionPayload) => Promise<BatchTransactionResult>;
     sendScriptTransaction: (payload: ScriptComposerPayload) => Promise<TransactionResult>;
+    view: (payload: ViewPayload) => Promise<any[]>;
     signMessage: (payload: SignMessagePayload) => Promise<SignMessageResult>;
     waitForTransaction: (hash: string) => Promise<TransactionStatus>;
     onTransactionUpdate?: (hash: string, callback: TransactionStatusCallback) => () => void;
@@ -366,6 +372,7 @@ declare class SecureMovementSDK {
     sendBatchTransactions(payload: BatchTransactionPayload): Promise<BatchTransactionResult>;
     sendScriptTransaction(payload: ScriptComposerPayload): Promise<TransactionResult>;
     getContext(): Promise<AppContext>;
+    view(payload: ViewPayload): Promise<any[]>;
     waitForTransaction(hash: string): Promise<TransactionStatus>;
     onTransactionUpdate(hash: string, callback: any): (() => void) | undefined;
     haptic(options: any): Promise<void | undefined>;
@@ -477,4 +484,4 @@ interface UseAnalyticsResult {
  */
 declare function useAnalytics(): UseAnalyticsResult;
 
-export { type AnalyticsAPI, type AnalyticsConfig, type AnalyticsEventProperties, type AnalyticsUserProperties, type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseAnalyticsResult, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, createSecurityManager, getMovementSDK, isInMovementApp, useAnalytics, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
+export { type AnalyticsAPI, type AnalyticsConfig, type AnalyticsEventProperties, type AnalyticsUserProperties, type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseAnalyticsResult, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, type ViewPayload, createSecurityManager, getMovementSDK, isInMovementApp, useAnalytics, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };

@@ -44,6 +44,13 @@ export interface ScriptComposerPayload {
   arguments?: any[];
 }
 
+// View Function Payload (read-only blockchain calls)
+export interface ViewPayload {
+  function: string;
+  type_arguments?: string[];
+  function_arguments?: any[];
+}
+
 export interface TransactionResult {
   hash: string;
   success: boolean;
@@ -269,6 +276,9 @@ export interface MovementSDK {
   sendFeePayerTransaction: (payload: FeePayerTransactionPayload) => Promise<TransactionResult>;
   sendBatchTransactions: (payload: BatchTransactionPayload) => Promise<BatchTransactionResult>;
   sendScriptTransaction: (payload: ScriptComposerPayload) => Promise<TransactionResult>;
+
+  // View Functions (read-only blockchain calls)
+  view: (payload: ViewPayload) => Promise<any[]>;
 
   // Signing Methods
   signMessage: (payload: SignMessagePayload) => Promise<SignMessageResult>;

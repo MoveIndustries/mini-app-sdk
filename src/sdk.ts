@@ -12,6 +12,7 @@ import type {
   BatchTransactionPayload,
   ScriptComposerPayload,
   BatchTransactionResult,
+  ViewPayload,
 } from './types';
 import { createSecurityManager, type SecurityConfig } from './security';
 
@@ -221,6 +222,19 @@ class SecureMovementSDK {
 
   async getContext() {
     return await this.sdk.getContext();
+  }
+
+  async view(payload: ViewPayload) {
+    // Rate limiting for view calls
+    if (!this.security.checkRateLimit('view')) {
+      this.security.logSecurityEvent({
+        type: 'rate_limit',
+        details: 'View function rate limit exceeded',
+      });
+      throw new Error('Too many view requests. Please try again later.');
+    }
+
+    return await this.sdk.view(payload);
   }
 
   async waitForTransaction(hash: string) {
