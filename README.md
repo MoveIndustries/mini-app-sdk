@@ -1,11 +1,11 @@
-# @movement-labs/miniapp-sdk
+# @moveindustries/miniapp-sdk
 
-Official SDK for building Movement Mini Apps - blockchain-powered applications that run inside the Movement Everything wallet.
+Official SDK for building Movement Mini Apps - blockchain-powered applications that run inside the Movement Everything mobile app.
 
 ## Installation
 
 ```bash
-npm install @movement-labs/miniapp-sdk
+npm install @moveindustries/miniapp-sdk
 ```
 
 ## Quick Start
@@ -13,7 +13,7 @@ npm install @movement-labs/miniapp-sdk
 ### Vanilla JavaScript
 
 ```javascript
-import { getMovementSDK } from '@movement-labs/miniapp-sdk';
+import { getMovementSDK } from '@moveindustries/miniapp-sdk';
 
 const sdk = getMovementSDK();
 
@@ -36,7 +36,7 @@ if (sdk) {
 ### React / Next.js
 
 ```typescript
-import { useMovementSDK } from '@movement-labs/miniapp-sdk';
+import { useMovementSDK } from '@moveindustries/miniapp-sdk';
 
 function MyApp() {
   const { sdk, isConnected, address, connect, sendTransaction } = useMovementSDK();
@@ -222,7 +222,7 @@ import type {
   TransactionResult,
   UserInfo,
   PopupOptions
-} from '@movement-labs/miniapp-sdk';
+} from '@moveindustries/miniapp-sdk';
 ```
 
 ### Transaction Parameters
