@@ -1,11 +1,11 @@
-# @moveindustries/miniapp-sdk
+# @moveindustries/mini-app-sdk
 
 Official SDK for building Movement Mini Apps - blockchain-powered applications that run inside the Movement Everything mobile app.
 
 ## Installation
 
 ```bash
-npm install @moveindustries/miniapp-sdk
+npm install @moveindustries/mini-app-sdk
 ```
 
 ## Quick Start
@@ -13,7 +13,7 @@ npm install @moveindustries/miniapp-sdk
 ### Vanilla JavaScript
 
 ```javascript
-import { getMovementSDK } from '@moveindustries/miniapp-sdk';
+import { getMovementSDK } from '@moveindustries/mini-app-sdk';
 
 const sdk = getMovementSDK();
 
@@ -36,7 +36,7 @@ if (sdk) {
 ### React / Next.js
 
 ```typescript
-import { useMovementSDK } from '@moveindustries/miniapp-sdk';
+import { useMovementSDK } from '@moveindustries/mini-app-sdk';
 
 function MyApp() {
   const { sdk, isConnected, address, connect, sendTransaction } = useMovementSDK();
@@ -222,7 +222,7 @@ import type {
   TransactionResult,
   UserInfo,
   PopupOptions
-} from '@moveindustries/miniapp-sdk';
+} from '@moveindustries/mini-app-sdk';
 ```
 
 ### Transaction Parameters
@@ -259,20 +259,20 @@ interface SendTransactionParams {
 ## Examples
 
 Check out example projects:
-- [Token Sender](https://github.com/movementlabsxyz/miniapp-examples/tree/main/token-sender)
-- [NFT Gallery](https://github.com/movementlabsxyz/miniapp-examples/tree/main/nft-gallery)
-- [Racing Game](https://github.com/movementlabsxyz/miniapp-examples/tree/main/racing-game)
+- [Token Sender](https://github.com/movementlabsxyz/mini-app-examples/tree/main/token-sender)
+- [NFT Gallery](https://github.com/movementlabsxyz/mini-app-examples/tree/main/nft-gallery)
+- [Racing Game](https://github.com/movementlabsxyz/mini-app-examples/tree/main/racing-game)
 
 ## Documentation
 
-Full documentation: https://docs.movementlabs.xyz/miniapps
+Full documentation: https://docs.movementnetwork.xyz/
 
 ## License
 
-MIT
+Apache 2.0
 
 ## Support
 
 - [Discord](https://discord.gg/movementlabs)
-- [GitHub Issues](https://github.com/movementlabsxyz/movement-miniapp-sdk/issues)
-- [Twitter](https://twitter.com/movementlabsxyz)
+- [GitHub Issues](https://github.com/moveindustries/mini-app-sdk/issues)
+- [Twitter / X](https://x.com/movement_xyz)
