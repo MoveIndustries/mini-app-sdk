@@ -374,6 +374,14 @@ export interface MovementSDK {
   mns?: MNSAPI;
 }
 
+/**
+ * AccountAddress object returned by MNS methods.
+ * Contains a byte array representation of the address that needs to be converted to hex.
+ */
+export interface AccountAddress {
+  data: Record<string, number>;
+}
+
 export interface MNSAPI {
   /**
    * Get the primary name for an address
@@ -385,9 +393,10 @@ export interface MNSAPI {
   /**
    * Get the target address for a name
    * @param name - The name to resolve (e.g., "alice" or "alice.move")
-   * @returns The target address or null if not found
+   * @returns An AccountAddress object or null if not found.
+   *          Convert to hex string: Object.values(result.data).map(b => b.toString(16).padStart(2, '0')).join('')
    */
-  getTargetAddress: (name: string) => Promise<string | null>;
+  getTargetAddress: (name: string) => Promise<AccountAddress | null>;
 }
 
 declare global {
