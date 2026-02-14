@@ -369,6 +369,25 @@ export interface MovementSDK {
 
   // Analytics API (bridged to host app's Mixpanel)
   analytics?: AnalyticsAPI;
+
+  // MNS (Movement Name Service) API
+  mns?: MNSAPI;
+}
+
+export interface MNSAPI {
+  /**
+   * Get the primary name for an address
+   * @param address - The wallet address to look up
+   * @returns The primary name (e.g., "alice") or null if not set
+   */
+  getPrimaryName: (address: string) => Promise<string | null>;
+
+  /**
+   * Get the target address for a name
+   * @param name - The name to resolve (e.g., "alice" or "alice.move")
+   * @returns The target address or null if not found
+   */
+  getTargetAddress: (name: string) => Promise<string | null>;
 }
 
 declare global {

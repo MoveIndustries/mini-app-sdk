@@ -266,6 +266,11 @@ class SecureMovementSDK {
   get storage() {
     return this.sdk.storage;
   }
+
+  // MNS (Movement Name Service) API
+  get mns() {
+    return this.sdk.mns;
+  }
 }
 
 export function getMovementSDK(config?: SecurityConfig): MovementSDK | null {

@@ -394,6 +394,10 @@ var SecureMovementSDK = class {
   get storage() {
     return this.sdk.storage;
   }
+  // MNS (Movement Name Service) API
+  get mns() {
+    return this.sdk.mns;
+  }
 };
 function getMovementSDK(config) {
   if (typeof window === "undefined") {

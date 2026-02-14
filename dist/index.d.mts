@@ -291,6 +291,21 @@ interface MovementSDK {
         getKeys: () => Promise<string[]>;
     };
     analytics?: AnalyticsAPI;
+    mns?: MNSAPI;
+}
+interface MNSAPI {
+    /**
+     * Get the primary name for an address
+     * @param address - The wallet address to look up
+     * @returns The primary name (e.g., "alice") or null if not set
+     */
+    getPrimaryName: (address: string) => Promise<string | null>;
+    /**
+     * Get the target address for a name
+     * @param name - The name to resolve (e.g., "alice" or "alice.move")
+     * @returns The target address or null if not found
+     */
+    getTargetAddress: (name: string) => Promise<string | null>;
 }
 declare global {
     interface Window {
@@ -395,6 +410,7 @@ declare class SecureMovementSDK {
             value: string;
         }[]>;
     } | undefined;
+    get mns(): MNSAPI | undefined;
 }
 declare function getMovementSDK(config?: SecurityConfig): MovementSDK | null;
 declare function isInMovementApp(): boolean;
@@ -490,4 +506,4 @@ interface UseAnalyticsResult {
  */
 declare function useAnalytics(): UseAnalyticsResult;
 
-export { type AnalyticsAPI, type AnalyticsConfig, type AnalyticsEventProperties, type AnalyticsUserProperties, type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseAnalyticsResult, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, type ViewPayload, createSecurityManager, getMovementSDK, isInMovementApp, useAnalytics, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
+export { type AnalyticsAPI, type AnalyticsConfig, type AnalyticsEventProperties, type AnalyticsUserProperties, type AppContext, type BatchTransactionPayload, type BatchTransactionResult, type BiometricOptions, type BiometricResult, type CameraOptions, type CameraResult, type FeePayerTransactionPayload, type HapticOptions, type LocationResult, type MNSAPI, type MovementAccount, type MovementSDK, type MultiAgentTransactionPayload, type NetworkInfo, type NotificationOptions, type PopupButton, type PopupOptions, type PopupResult, type ScriptComposerPayload, SecureMovementSDK, type SecurityConfig, type ShareOptions, type SignMessagePayload, type SignMessageResult, type StorageOptions, type ThemeInfo, type TransactionPayload, type TransactionResult, type TransactionStatus, type TransactionStatusCallback, type UseAnalyticsResult, type UseMovementAccountResult, type UseMovementSDKResult, type UseMovementThemeResult, type ViewPayload, createSecurityManager, getMovementSDK, isInMovementApp, useAnalytics, useMovementAccount, useMovementSDK, useMovementTheme, waitForSDK };
